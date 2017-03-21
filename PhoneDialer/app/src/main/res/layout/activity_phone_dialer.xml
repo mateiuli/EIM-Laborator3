@@ -159,6 +159,14 @@
             android:layout_height="47dp" />
 
         <ImageButton
+            app:srcCompat="@drawable/ic_launcher"
+            android:id="@+id/button_contacts_manager"
+            android:layout_row="4"
+            android:layout_column="1"
+            android:layout_width="84dp"
+            android:layout_height="47dp" />
+
+        <ImageButton
             android:layout_width="84dp"
             app:srcCompat="@drawable/hangup"
             android:id="@+id/button_hangup"

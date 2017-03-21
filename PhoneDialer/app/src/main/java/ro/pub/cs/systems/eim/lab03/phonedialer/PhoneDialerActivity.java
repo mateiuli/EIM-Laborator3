@@ -1,6 +1,7 @@
 package ro.pub.cs.systems.eim.lab03.phonedialer;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class PhoneDialerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -39,7 +41,8 @@ public class PhoneDialerActivity extends AppCompatActivity implements View.OnCli
                 R.id.button_hash,
                 R.id.button_hangup,
                 R.id.button_call,
-                R.id.button_backspace
+                R.id.button_backspace,
+                R.id.button_contacts_manager
         };
 
         for(int id : buttons) {
@@ -61,21 +64,29 @@ public class PhoneDialerActivity extends AppCompatActivity implements View.OnCli
             ImageButton hangup = (ImageButton)findViewById(R.id.button_hangup);
             ImageButton call = (ImageButton)findViewById(R.id.button_call);
             ImageButton backspace = (ImageButton)findViewById(R.id.button_backspace);
+            ImageButton contacts_manager = (ImageButton)findViewById(R.id.button_contacts_manager);
 
             ImageButton btn = (ImageButton)view;
             if(btn.equals(backspace)) {
                 if(editText.getText().length() > 0)
                     editText.setText(editText.getText().subSequence(0, editText.getText().length() - 1));
             } else if(btn.equals(call)) {
-                if (ContextCompat.checkSelfPermission(PhoneDialerActivity.this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                            PhoneDialerActivity.this,
-                            new String[]{Manifest.permission.CALL_PHONE},
-                            SyncStateContract.Constants.PERMISSION_REQUEST_CALL_PHONE);
-                } else {
-                    Intent intent = new Intent(Intent.ACTION_CALL);
-                    intent.setData(Uri.parse("tel:" + editText.getText().toString()));
+                String phoneNumber = ((EditText)findViewById(R.id.editText)).getText().toString();
+                Intent intent = new Intent(Intent.ACTION_CALL);
+                intent.setData(Uri.parse("tel:" + phoneNumber));
+                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     startActivity(intent);
+                } else {
+                    ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.CALL_PHONE}, 1);
+                }
+            } else if(btn.equals(contacts_manager)) {
+                String phoneNumber = ((EditText)findViewById(R.id.editText)).getText().toString();
+                if (phoneNumber.length() > 0) {
+                    Intent intent = new Intent("ro.pub.cs.systems.eim.lab04.contactsmanager.intent.action.ContactsManagerActivity");
+                    intent.putExtra("ro.pub.cs.systems.eim.lab04.contactsmanager.PHONE_NUMBER_KEY", phoneNumber);
+                    startActivityForResult(intent, Constants.CONTACTS_MANAGER_REQUEST_CODE);
+                } else {
+                    Toast.makeText(getApplication(), "Introdu un numar de telefon", Toast.LENGTH_LONG).show();
                 }
             }
         }
